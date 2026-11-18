@@ -1,19 +1,17 @@
-// F6: Interactive Puzzle Engine
-// Owner: Farin (Hard)
-// Mounted at /api/puzzles in routes/index.js (already registered, you don't need to edit index.js).
-//
-// How to build this feature (MVC):
-//   1. Model      -> server/src/models/<Name>.js
-//   2. Controller -> server/src/controllers/puzzleController.js (functions wrapped in asyncHandler)
-//   3. Routes     -> replace the placeholder below with real routes that call the controller
+// F6: Interactive Puzzle Engine (Owner: Farin, Hard)
 const router = require('express').Router();
 const { protect } = require('../middleware/auth');
+const c = require('../controllers/puzzleController');
 
 router.use(protect);
 
-// Placeholder: remove when you add real routes.
-router.get('/', (req, res) => {
-  res.status(501).json({ feature: 'F6', name: 'Interactive Puzzle Engine', owner: 'Farin', status: 'not implemented yet' });
-});
+router.get('/', c.listMine);
+router.post('/', c.startNew);
+router.get('/attempts/:id', c.getAttempt);
+router.put('/attempts/:id/state', c.saveState);
+router.post('/attempts/:id/move', c.move);
+router.post('/attempts/:id/hint', c.hint);
+router.post('/attempts/:id/check', c.check);
+router.post('/attempts/:id/give-up', c.giveUp);
 
 module.exports = router;
