@@ -1,19 +1,20 @@
-// F13: Clans / Study Groups
-// Owner: Mim (Medium)
-// Mounted at /api/clans in routes/index.js (already registered, you don't need to edit index.js).
-//
-// How to build this feature (MVC):
-//   1. Model      -> server/src/models/<Name>.js
-//   2. Controller -> server/src/controllers/clanController.js (functions wrapped in asyncHandler)
-//   3. Routes     -> replace the placeholder below with real routes that call the controller
+// F13: Clans / Study Groups (Owner: Mim, Medium)
 const router = require('express').Router();
 const { protect } = require('../middleware/auth');
+const c = require('../controllers/clanController');
 
 router.use(protect);
 
-// Placeholder: remove when you add real routes.
-router.get('/', (req, res) => {
-  res.status(501).json({ feature: 'F13', name: 'Clans / Study Groups', owner: 'Mim', status: 'not implemented yet' });
-});
+router.get('/', c.list);
+router.get('/mine', c.mine);
+router.post('/', c.create);
+router.get('/:id', c.get);
+router.post('/:id/join', c.join);
+router.post('/:id/leave', c.leave);
+router.patch('/:id/members/:userId', c.setRole);
+router.delete('/:id/members/:userId', c.removeMember);
+router.post('/:id/transfer', c.transfer);
+router.post('/:id/challenges', c.addChallenge);
+router.delete('/:id/challenges/:challengeId', c.removeChallenge);
 
 module.exports = router;
