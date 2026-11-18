@@ -1,19 +1,18 @@
-// F8: Quiz Authoring & Publishing Workflow
-// Owner: Farin (Medium)
-// Mounted at /api/quizzes in routes/index.js (already registered, you don't need to edit index.js).
-//
-// How to build this feature (MVC):
-//   1. Model      -> server/src/models/<Name>.js
-//   2. Controller -> server/src/controllers/quizController.js (functions wrapped in asyncHandler)
-//   3. Routes     -> replace the placeholder below with real routes that call the controller
+// F8: Quiz Authoring & Publishing Workflow (Owner: Farin, Medium)
 const router = require('express').Router();
 const { protect } = require('../middleware/auth');
+const c = require('../controllers/quizController');
 
 router.use(protect);
 
-// Placeholder: remove when you add real routes.
-router.get('/', (req, res) => {
-  res.status(501).json({ feature: 'F8', name: 'Quiz Authoring & Publishing Workflow', owner: 'Farin', status: 'not implemented yet' });
-});
+router.get('/', c.browse);
+router.get('/mine', c.mine);
+router.post('/', c.create);
+router.get('/:id', c.get);
+router.put('/:id', c.update);
+router.delete('/:id', c.remove);
+router.post('/:id/publish', c.publish);
+router.post('/:id/unpublish', c.unpublish);
+router.post('/:id/import-csv', c.importCsv);
 
 module.exports = router;
