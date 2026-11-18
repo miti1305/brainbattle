@@ -1,19 +1,18 @@
-// F11: Tournament Management
-// Owner: Mim (Hard)
-// Mounted at /api/tournaments in routes/index.js (already registered, you don't need to edit index.js).
-//
-// How to build this feature (MVC):
-//   1. Model      -> server/src/models/<Name>.js
-//   2. Controller -> server/src/controllers/tournamentController.js (functions wrapped in asyncHandler)
-//   3. Routes     -> replace the placeholder below with real routes that call the controller
+// F11: Tournament Management (Owner: Mim, Hard)
 const router = require('express').Router();
 const { protect } = require('../middleware/auth');
+const c = require('../controllers/tournamentController');
 
 router.use(protect);
 
-// Placeholder: remove when you add real routes.
-router.get('/', (req, res) => {
-  res.status(501).json({ feature: 'F11', name: 'Tournament Management', owner: 'Mim', status: 'not implemented yet' });
-});
+router.get('/', c.list);
+router.post('/', c.create);
+router.get('/:id', c.get);
+router.post('/:id/register', c.register);
+router.post('/:id/unregister', c.unregister);
+router.post('/:id/start', c.start);
+router.post('/:id/cancel', c.cancel);
+router.post('/:id/matches/:index/play', c.play);
+router.post('/:id/matches/:index/walkover', c.walkover);
 
 module.exports = router;
