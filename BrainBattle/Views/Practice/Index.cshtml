@@ -1,0 +1,90 @@
+@* F19 (Moontaha): choose category/difficulty (or one quiz from F8/F9), last result and history. *@
+@model PracticeIndexViewModel
+@{ ViewData["Title"] = "Solo Practice"; }
+<div class="container py-4">
+    <h2>Solo Practice</h2>
+    @if (Model.Result != null)
+    {
+        var r = Model.Result;
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Result: @r.Correct/@r.Questions.Count correct · @r.Score points</h5>
+                <details>
+                    <summary>Review answers</summary>
+                    <ol class="mt-2 small">
+                        @for (var i = 0; i < r.Questions.Count; i++)
+                        {
+                            var q = r.Questions[i];
+                            var a = r.Answers.FirstOrDefault(x => x.QIndex == i);
+                            var mine = a == null || a.Choice < 0 || a.Choice >= q.Options.Count ? "none" : q.Options[a.Choice];
+                            <li class="mb-2">
+                                @q.Text
+                                <div class="@(a != null && a.IsCorrect ? "text-success" : "text-danger")">Your answer: @mine · Correct: @q.Options[q.CorrectIndex]</div>
+                                @if (!string.IsNullOrEmpty(q.Explanation))
+                                {
+                                    <div class="text-muted">@q.Explanation</div>
+                                }
+                            </li>
+                        }
+                    </ol>
+                </details>
+            </div>
+        </div>
+    }
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <form class="card card-body" method="post" action="/practice/start" asp-antiforgery="true">
+                @if (Model.Setup.QuizId != null)
+                {
+                    <input type="hidden" name="QuizId" value="@Model.Setup.QuizId" />
+                    <p>Practising @(Model.QuizTitle == null ? "a specific quiz" : "\"" + Model.QuizTitle + "\""). <a href="/practice">Choose a category instead</a></p>
+                }
+                else
+                {
+                    <label class="form-label" for="CategoryId">Category</label>
+                    <select class="form-select mb-2" id="CategoryId" name="CategoryId">
+                        <option value="">Mixed</option>
+                        @foreach (var c in Model.Categories)
+                        {
+                            <option value="@c.Id" selected="@(c.Id == Model.Setup.CategoryId)">@c.Name</option>
+                        }
+                    </select>
+                    <label class="form-label" for="Difficulty">Difficulty</label>
+                    <select class="form-select mb-2" id="Difficulty" name="Difficulty">
+                        <option value="">Any</option>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                }
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small" for="Count">Questions</label>
+                        <input type="number" min="3" max="20" class="form-control" id="Count" name="Count" value="@Model.Setup.Count" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small" for="QuestionTime">Seconds per question</label>
+                        <input type="number" min="5" max="60" class="form-control" id="QuestionTime" name="QuestionTime" value="@Model.Setup.QuestionTime" />
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Start practice</button>
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <h6>Recent practice</h6>
+            <table class="table table-sm">
+                <thead><tr><th>Topic</th><th>Difficulty</th><th>Correct</th><th>Date</th></tr></thead>
+                <tbody>
+                    @if (Model.History.Count == 0)
+                    {
+                        <tr><td colspan="4" class="text-muted">No sessions yet.</td></tr>
+                    }
+                    @foreach (var h in Model.History)
+                    {
+                        <tr><td><a href="/practice?result=@h.Id">@h.Label</a></td><td>@h.Difficulty</td><td>@h.Correct/@h.Total</td><td class="small">@HtmlExtensions.Local(h.FinishedAt, "dd MMM yyyy")</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

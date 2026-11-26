@@ -1,0 +1,59 @@
+@* F16 (Moontaha): start / end ranked seasons and see the archived final standings. *@
+@model AdminSeasonsViewModel
+@{
+    ViewData["Title"] = "Seasons";
+    var active = Model.Active;
+}
+<div class="container py-4">
+    <partial name="_Tabs.cshtml" model="@("seasons")" />
+    <div class="row g-4">
+        <div class="col-lg-5">
+            @if (active != null)
+            {
+                <div class="card card-body mb-3">
+                    <h6>Current: @active.Name</h6>
+                    <p class="small text-muted">Started @HtmlExtensions.Local(active.StartedAt, "dd MMM yyyy")</p>
+                    <form method="post" action="/admin/seasons/@active.Id/end" asp-antiforgery="true"
+                          data-confirm="End the season? The leaderboard is archived and every rating is moved halfway back to 1200.">
+                        <button class="btn btn-danger" type="submit">End season &amp; reset ratings</button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <form class="card card-body mb-3" method="post" action="/admin/seasons" asp-antiforgery="true">
+                    <h6>Start a new season</h6>
+                    <input class="form-control mb-2" name="name" placeholder="Season name (optional)" />
+                    <button class="btn btn-success" type="submit">Start season</button>
+                </form>
+            }
+            <ul class="list-group">
+                @foreach (var s in Model.Seasons)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>#@s.Number @s.Name <span class="badge bg-@(s.Status == "active" ? "success" : "secondary")">@s.Status</span></span>
+                        @if (s.Status == "ended")
+                        {
+                            <a class="btn btn-sm btn-link" href="/admin/seasons?view=@s.Id">Final standings</a>
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="col-lg-7">
+            @if (Model.Viewing != null)
+            {
+                <h6>@Model.Viewing.Name · final standings</h6>
+                <table class="table table-sm">
+                    <thead><tr><th>#</th><th>Player</th><th>Rating</th><th>Tier</th><th>Wins</th></tr></thead>
+                    <tbody>
+                        @foreach (var a in Model.Viewing.Archive)
+                        {
+                            <tr><td>@a.Rank</td><td>@a.Username</td><td>@a.Rating</td><td>@a.Tier</td><td>@a.Wins</td></tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

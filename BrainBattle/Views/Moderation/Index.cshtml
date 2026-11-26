@@ -1,0 +1,99 @@
+@* F18 (Moontaha): moderation queue (open / actioned / dismissed reports) and the audit log. *@
+@model ModerationViewModel
+@{ ViewData["Title"] = "Moderation"; }
+<div class="container py-4">
+    <h2>Moderation</h2>
+    <ul class="nav nav-tabs mb-3">
+        @foreach (var t in ModerationViewModel.Tabs)
+        {
+            <li class="nav-item"><a class="nav-link @(Model.Tab == t.Key ? "active" : "")" href="/moderation?tab=@t.Key">@t.Label</a></li>
+        }
+    </ul>
+
+    @if (Model.Tab == "logs")
+    {
+        <table class="table table-sm">
+            <thead><tr><th>When</th><th>Moderator</th><th>Action</th><th>Target</th><th>User</th><th>Note</th></tr></thead>
+            <tbody>
+                @foreach (var l in Model.Logs)
+                {
+                    <tr>
+                        <td class="small">@HtmlExtensions.Local(l.Log.CreatedAt)</td>
+                        <td>@l.ModeratorName</td>
+                        <td><span class="badge bg-secondary">@l.Log.Action</span></td>
+                        <td>@l.Log.TargetType</td>
+                        <td>@l.TargetUserName</td>
+                        <td class="small">@l.Log.Note</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        if (Model.Reports.Count == 0)
+        {
+            <p class="text-muted">No reports here.</p>
+        }
+        foreach (var row in Model.Reports)
+        {
+            var r = row.Report;
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <div>
+                            <span class="badge bg-dark me-2">@r.TargetType</span>
+                            <strong>@r.Reason</strong>
+                            <div class="mt-1">@r.Preview</div>
+                            @if (!string.IsNullOrEmpty(r.Details))
+                            {
+                                <div class="small text-muted">"@r.Details"</div>
+                            }
+                            <div class="small text-muted mt-1">
+                                Reported by @row.ReporterName · @HtmlExtensions.Local(r.CreatedAt) · content by @row.OwnerName
+                                @if (row.OwnerSuspended)
+                                {
+                                    <span class="badge bg-danger ms-1">suspended</span>
+                                }
+                            </div>
+                            @if (r.Status != "open")
+                            {
+                                <div class="small mt-1">Resolved by @row.ResolvedByName: @r.Resolution</div>
+                            }
+                        </div>
+                        @if (r.Status == "open")
+                        {
+                            <div class="d-flex gap-1 flex-wrap align-items-start">
+                                <form method="post" action="/moderation/reports/@r.Id/dismiss" asp-antiforgery="true">
+                                    <button class="btn btn-sm btn-outline-secondary" type="submit">Dismiss</button>
+                                </form>
+                                @if (r.TargetType != "user")
+                                {
+                                    <form method="post" action="/moderation/reports/@r.Id/remove" asp-antiforgery="true" data-confirm="Remove this content?">
+                                        <button class="btn btn-sm btn-outline-danger" type="submit">Remove content</button>
+                                    </form>
+                                }
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-warning" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">Warn</button>
+                                    <form class="dropdown-menu dropdown-menu-end p-2" style="min-width: 280px" method="post" action="/moderation/reports/@r.Id/warn" asp-antiforgery="true">
+                                        <textarea class="form-control form-control-sm mb-2" name="message" rows="2">Please follow the community rules (@r.Reason).</textarea>
+                                        <button class="btn btn-sm btn-warning" type="submit">Send warning</button>
+                                    </form>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-danger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">Suspend</button>
+                                    <form class="dropdown-menu dropdown-menu-end p-2" style="min-width: 220px" method="post" action="/moderation/reports/@r.Id/suspend" asp-antiforgery="true">
+                                        <label class="form-label small">Days</label>
+                                        <input type="number" min="1" max="365" class="form-control form-control-sm mb-2" name="days" value="3" />
+                                        <input type="hidden" name="note" value="" />
+                                        <button class="btn btn-sm btn-danger" type="submit">Suspend user</button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

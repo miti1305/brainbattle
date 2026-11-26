@@ -1,0 +1,18 @@
+@* F19 (Moontaha): practice questions one by one with a timer and an explanation after each answer.
+   Drawn by wwwroot/js/practice.js. *@
+@model PracticePlayViewModel
+@{ ViewData["Title"] = "Practice"; }
+<div class="container py-4" style="max-width: 720px">
+    <div class="d-flex justify-content-between mb-2">
+        <h4 class="mb-0">Practice</h4>
+        <span class="text-muted">Practice does not change your rating</span>
+    </div>
+    <div id="practice-error" class="alert alert-danger d-none"></div>
+    <div id="practice-timer"></div>
+    <div id="practice-question"></div>
+    <div id="practice-feedback"></div>
+</div>
+@Html.JsonData("page-data", Model)
+@section Scripts {
+    <script src="~/js/practice.js" asp-append-version="true"></script>
+}

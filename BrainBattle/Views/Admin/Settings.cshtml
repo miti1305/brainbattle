@@ -1,0 +1,27 @@
+@* F16 (Moontaha): XP rewards, level curve and matchmaking range used by F17 and F2. *@
+@model AdminSettingsViewModel
+@{ ViewData["Title"] = "Game settings"; }
+<div class="container py-4">
+    <partial name="_Tabs.cshtml" model="@("settings")" />
+    <form method="post" action="/admin/settings" asp-antiforgery="true" style="max-width: 560px">
+        <h6>XP rewards</h6>
+        @foreach (var xp in AdminSettingsViewModel.XpLabels)
+        {
+            <div class="row mb-2 align-items-center">
+                <label class="col-8 small" for="xp-@xp.Key">@xp.Label</label>
+                <div class="col-4"><input type="number" min="0" max="1000" class="form-control form-control-sm" id="xp-@xp.Key" name="XpValues.@xp.Key" value="@Model.XpValue(xp.Key)" /></div>
+            </div>
+        }
+        <h6 class="mt-3">Levels</h6>
+        <div class="row mb-2 align-items-center">
+            <label class="col-8 small" for="LevelBase">XP needed for level 2 (later levels need more)</label>
+            <div class="col-4"><input type="number" min="10" class="form-control form-control-sm" id="LevelBase" name="LevelBase" value="@Model.Settings.LevelBase" /></div>
+        </div>
+        <h6 class="mt-3">Matchmaking</h6>
+        <div class="row mb-3 align-items-center">
+            <label class="col-8 small" for="MatchmakingRangeStep">Rating range added every 10 s of waiting</label>
+            <div class="col-4"><input type="number" min="10" max="300" class="form-control form-control-sm" id="MatchmakingRangeStep" name="MatchmakingRangeStep" value="@Model.Settings.MatchmakingRangeStep" /></div>
+        </div>
+        <button class="btn btn-primary" type="submit">Save settings</button>
+    </form>
+</div>

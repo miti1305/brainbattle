@@ -1,0 +1,77 @@
+@* F16 (Moontaha): search users, change roles, suspend and unsuspend. *@
+@model AdminUsersViewModel
+@{ ViewData["Title"] = "Users"; }
+<div class="container py-4">
+    <partial name="_Tabs.cshtml" model="@("users")" />
+    <form method="get" action="/admin/users" class="row g-2 mb-3">
+        <div class="col-md-6"><input class="form-control" name="q" placeholder="Search username or email" value="@Model.Q" /></div>
+        <div class="col-md-3">
+            <select class="form-select" name="role">
+                <option value="">All roles</option>
+                <option value="player" selected="@(Model.Role == "player")">Players</option>
+                <option value="moderator" selected="@(Model.Role == "moderator")">Moderators</option>
+                <option value="admin" selected="@(Model.Role == "admin")">Admins</option>
+            </select>
+        </div>
+        <div class="col-md-3"><button class="btn btn-outline-primary w-100" type="submit">Search</button></div>
+    </form>
+    <table class="table align-middle">
+        <thead><tr><th>Username</th><th>Email</th><th>Joined</th><th>Role</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var u in Model.Users)
+            {
+                var self = u.Id == Model.MeId;
+                <tr>
+                    <td>@u.Username</td>
+                    <td class="small">@u.Email</td>
+                    <td class="small">@HtmlExtensions.Local(u.CreatedAt, "dd MMM yyyy")</td>
+                    <td>
+                        <form method="post" action="/admin/users/@u.Id/role" asp-antiforgery="true">
+                            <select class="form-select form-select-sm" name="role" onchange="this.form.submit()" disabled="@self">
+                                @foreach (var r in BrainBattle.Models.User.Roles)
+                                {
+                                    <option value="@r" selected="@(u.Role == r)">@r</option>
+                                }
+                            </select>
+                        </form>
+                    </td>
+                    <td>
+                        @if (u.IsSuspended)
+                        {
+                            <span class="badge bg-danger">@("suspended" + (u.SuspendedUntil != null ? " until " + HtmlExtensions.Local(u.SuspendedUntil, "dd MMM yyyy") : ""))</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">active</span>
+                        }
+                    </td>
+                    <td>
+                        @if (self)
+                        {
+                            <span class="small text-muted">you</span>
+                        }
+                        else if (u.IsSuspended)
+                        {
+                            <form method="post" action="/admin/users/@u.Id/unban" asp-antiforgery="true">
+                                <button class="btn btn-sm btn-outline-success" type="submit">Unban</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" action="/admin/users/@u.Id/ban" asp-antiforgery="true" class="d-flex gap-1" data-confirm="Suspend @u.Username?">
+                                <input type="number" min="1" class="form-control form-control-sm" style="width: 70px" name="days" value="3" title="Days (empty = until unbanned)" />
+                                <input class="form-control form-control-sm" style="width: 160px" name="reason" placeholder="Reason" value="Breaking community rules" />
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Ban</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="d-flex gap-2 align-items-center">
+        <a class="btn btn-sm btn-outline-secondary @(Model.Page <= 1 ? "disabled" : "")" href="@(Model.PageUrl(Model.Page - 1))">Previous</a>
+        <span>Page @Model.Page of @Model.Pages (@Model.Total users)</span>
+        <a class="btn btn-sm btn-outline-secondary @(Model.Page >= Model.Pages ? "disabled" : "")" href="@(Model.PageUrl(Model.Page + 1))">Next</a>
+    </div>
+</div>

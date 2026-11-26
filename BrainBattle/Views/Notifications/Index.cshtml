@@ -1,0 +1,72 @@
+@* F20 (Moontaha): notification list and preferences. wwwroot/js/notifications.js reloads the list
+   when a new notification arrives (the navbar badge itself is updated by site.js). *@
+@using BrainBattle.Services
+@model NotificationsViewModel
+@{ ViewData["Title"] = "Notifications"; }
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Notifications</h2>
+                <div class="d-flex gap-2 align-items-center">
+                    <form method="get" action="/notifications" class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" id="unread" name="unread" value="true" checked="@Model.UnreadOnly" onchange="this.form.submit()" />
+                        <label class="form-check-label small" for="unread">Unread only</label>
+                    </form>
+                    <form method="post" action="/notifications/read-all" asp-antiforgery="true">
+                        <button class="btn btn-sm btn-outline-primary" type="submit">Mark all read</button>
+                    </form>
+                </div>
+            </div>
+            @if (Model.Items.Count == 0)
+            {
+                <p class="text-muted">You're all caught up.</p>
+            }
+            <div class="list-group">
+                @foreach (var n in Model.Items)
+                {
+                    <div class="list-group-item d-flex justify-content-between align-items-start @(n.Read ? "" : "list-group-item-primary")">
+                        <a class="text-start text-decoration-none text-reset flex-grow-1" href="/notifications/@n.Id/open">
+                            <div class="fw-semibold">@(n.Read ? "" : "● ")@n.Title</div>
+                            <div class="small">@n.Message</div>
+                            <div class="small text-muted">@HtmlExtensions.Local(n.CreatedAt)</div>
+                        </a>
+                        <form method="post" action="/notifications/@n.Id/delete" asp-antiforgery="true">
+                            <button class="btn btn-sm btn-link text-muted" type="submit" title="Delete">✕</button>
+                        </form>
+                    </div>
+                }
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                @if (Model.Page > 1)
+                {
+                    <a class="btn btn-sm btn-outline-secondary" href="/notifications?unread=@(Model.UnreadOnly ? "true" : "false")&page=@(Model.Page - 1)">Newer</a>
+                }
+                @if (Model.HasMore)
+                {
+                    <a class="btn btn-sm btn-outline-secondary" href="/notifications?unread=@(Model.UnreadOnly ? "true" : "false")&page=@(Model.Page + 1)">Older</a>
+                }
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <form class="card" method="post" action="/notifications/preferences" asp-antiforgery="true">
+                <div class="card-body">
+                    <h6>Notify me about</h6>
+                    @foreach (var t in Notification.Types)
+                    {
+                        var alwaysOn = NotificationService.AlwaysSent.Contains(t);
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="pref-@t" name="enabled" value="@t"
+                                   checked="@(!Model.Disabled.Contains(t))" disabled="@alwaysOn" />
+                            <label class="form-check-label small" for="pref-@t">@(NotificationsViewModel.Labels.GetValueOrDefault(t, t))@(alwaysOn ? " (always on)" : "")</label>
+                        </div>
+                    }
+                    <button class="btn btn-sm btn-primary mt-2" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/notifications.js" asp-append-version="true"></script>
+}

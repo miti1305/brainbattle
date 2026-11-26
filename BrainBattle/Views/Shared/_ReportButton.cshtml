@@ -1,0 +1,23 @@
+@* F18 (Moontaha) SHARED: "Report" button for any content (quiz, question, user, feed post).
+   Other pages show it with:  @await Html.PartialIfExistsAsync("_ReportButton", new ReportButtonModel("quiz", quiz.Id))
+   The form is sent to ModerationController (POST /moderation/reports) and the user returns to the same page. *@
+@model ReportButtonModel
+<div class="dropdown d-inline-block">
+    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="dropdown" data-bs-auto-close="outside">@Model.Label</button>
+    <form class="dropdown-menu dropdown-menu-end p-2" style="min-width: 280px" method="post" action="/moderation/reports" asp-antiforgery="true">
+        <input type="hidden" name="targetType" value="@Model.TargetType" />
+        <input type="hidden" name="targetId" value="@Model.TargetId" />
+        @if (Model.QuestionIndex != null)
+        {
+            <input type="hidden" name="questionIndex" value="@Model.QuestionIndex" />
+        }
+        <select class="form-select form-select-sm mb-2" name="reason">
+            @foreach (var reason in ModerationViewModel.Reasons)
+            {
+                <option>@reason</option>
+            }
+        </select>
+        <textarea class="form-control form-control-sm mb-2" name="details" rows="2" maxlength="500" placeholder="Details (optional)"></textarea>
+        <button type="submit" class="btn btn-sm btn-danger">Send</button>
+    </form>
+</div>

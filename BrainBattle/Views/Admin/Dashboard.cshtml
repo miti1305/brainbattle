@@ -1,0 +1,46 @@
+@* F16 (Moontaha): admin overview - statistics and matches per day (chart: wwwroot/js/admin.js). *@
+@model AdminStatsViewModel
+@{
+    ViewData["Title"] = "Admin dashboard";
+    var cards = new (string Label, long Value)[]
+    {
+        ("Users", Model.TotalUsers), ("New users (7 days)", Model.NewUsers7d), ("Active players (7 days)", Model.ActivePlayers7d),
+        ("Matches today", Model.MatchesToday), ("Published quizzes", Model.PublishedQuizzes), ("Puzzles solved", Model.PuzzlesSolved),
+        ("Suspended users", Model.SuspendedUsers),
+    };
+}
+<div class="container py-4">
+    <partial name="_Tabs.cshtml" model="@("overview")" />
+    <div class="row g-3 mb-4">
+        @foreach (var card in cards)
+        {
+            <div class="col-6 col-md-3">
+                <div class="card text-center h-100"><div class="card-body py-3"><div class="fs-3 fw-bold">@card.Value</div><div class="small text-muted">@card.Label</div></div></div>
+            </div>
+        }
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <h6>Matches per day (last 14 days)</h6>
+            <canvas id="chart-matches"></canvas>
+        </div>
+        <div class="col-lg-4">
+            <h6>Popular categories</h6>
+            <ul class="list-group">
+                @if (Model.PopularCategories.Count == 0)
+                {
+                    <li class="list-group-item text-muted">No matches yet.</li>
+                }
+                @foreach (var c in Model.PopularCategories)
+                {
+                    <li class="list-group-item d-flex justify-content-between">@c.Name<span class="badge bg-primary">@c.Matches</span></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+@Html.JsonData("page-data", Model.MatchesPerDay)
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+}
