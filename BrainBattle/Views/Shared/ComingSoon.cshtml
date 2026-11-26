@@ -1,0 +1,12 @@
+@* SHARED: temporary page shown until a feature's owner merges the real page. *@
+@model ComingSoonViewModel
+@{ ViewData["Title"] = Model.Feature.Name; }
+<div class="container py-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <span class="badge bg-secondary mb-2">@Model.Feature.Id</span>
+            <h3>@Model.Feature.Name</h3>
+            <p class="text-muted mb-0">Coming soon. Owner: @Model.Feature.Owner</p>
+        </div>
+    </div>
+</div>

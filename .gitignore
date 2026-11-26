@@ -1,0 +1,12 @@
+# .NET build output
+bin/
+obj/
+*.user
+.vs/
+
+# Secrets: NEVER commit these
+.env
+
+# OS / editor files
+.DS_Store
+Thumbs.db

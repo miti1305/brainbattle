@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- BrainBattle: ASP.NET Core 10 MVC web app (C#).
+       Models = C# classes stored in MongoDB, Views = Razor (.cshtml), Controllers = C# controllers.
+       Business logic lives in Services/, real-time in Hubs/ (SignalR), timed jobs in Jobs/. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>BrainBattle</RootNamespace>
+    <AssemblyName>BrainBattle</AssemblyName>
+    <NoWarn>$(NoWarn);CS1998;CS8632</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.28.0" />
+  </ItemGroup>
+
+</Project>

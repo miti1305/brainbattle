@@ -1,0 +1,7 @@
+@using BrainBattle
+@using BrainBattle.Core
+@using BrainBattle.Models
+@using BrainBattle.ViewModels
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@* <option selected="@condition"> is written as plain HTML in our views, so the option tag helper is not needed. *@
+@removeTagHelper Microsoft.AspNetCore.Mvc.TagHelpers.OptionTagHelper, Microsoft.AspNetCore.Mvc.TagHelpers

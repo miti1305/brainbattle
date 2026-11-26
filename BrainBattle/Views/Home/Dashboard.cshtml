@@ -1,0 +1,33 @@
+@* Lists every feature grouped by owner, so the team can open each page during development. *@
+@model IEnumerable<FeatureInfo>
+@{
+    ViewData["Title"] = "Dashboard";
+    var me = Context.CurrentUser();
+    string LevelColor(string level) => level == "Hard" ? "danger" : level == "Medium" ? "warning" : "success";
+}
+<div class="container py-4">
+    <h2 class="mb-1">Welcome, @me.Username</h2>
+    <p class="text-muted">Pick a feature to open it.</p>
+    @foreach (var member in FeatureCatalog.Members)
+    {
+        <div class="mb-4">
+            <h5 class="border-bottom pb-1">@member</h5>
+            <div class="row g-3">
+                @foreach (var f in Model.Where(x => x.Owner == member && FeatureCatalog.Allowed(x, me.Role)))
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <a href="@f.Path" class="text-decoration-none">
+                            <div class="card feature-card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <span class="badge bg-secondary me-2">@f.Id</span>
+                                    <span class="badge bg-@LevelColor(f.Level)">@f.Level</span>
+                                    <h6 class="mt-2 mb-0 text-dark">@f.Name</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

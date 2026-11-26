@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Home";
+    var me = Context.CurrentUser();
+}
+<div class="container py-5 text-center">
+    <h1 class="display-5 fw-bold">BrainBattle</h1>
+    <p class="lead text-muted">Social puzzles, quizzes and live competitions.</p>
+    @if (me != null)
+    {
+        <a class="btn btn-primary btn-lg" href="/dashboard">Go to dashboard</a>
+    }
+    else
+    {
+        <div class="d-flex gap-2 justify-content-center">
+            <a class="btn btn-primary btn-lg" href="/register">Create account</a>
+            <a class="btn btn-outline-secondary btn-lg" href="/login">Log in</a>
+        </div>
+    }
+</div>

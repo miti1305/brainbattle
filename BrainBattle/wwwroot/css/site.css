@@ -1,0 +1,26 @@
+/* Shared styles for every page. Feature-specific styles can be added at the end (one block per feature). */
+body { background: #f5f7fb; }
+.feature-card { transition: transform 0.15s ease; }
+.feature-card:hover { transform: translateY(-2px); }
+.bb-toasts { position: fixed; right: 1rem; bottom: 1rem; z-index: 1080; }
+.bb-timer .progress { height: 8px; }
+.bb-pre { white-space: pre-wrap; }
+.min-w-0 { min-width: 0; }
+
+/* Puzzle boards (F6/F7 Farin) */
+.puzzle-grid { display: inline-grid; gap: 0; border: 2px solid #333; background: #fff; user-select: none; }
+.puzzle-cell { width: 38px; height: 38px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 1.1rem; text-transform: uppercase; }
+.puzzle-cell input { width: 100%; height: 100%; border: 0; text-align: center; font-weight: 600; font-size: 1.1rem;
+  text-transform: uppercase; background: transparent; outline: none; }
+.puzzle-cell.given { background: #eef1f6; }
+.puzzle-cell.conflict { background: #f8d7da; }
+.puzzle-cell.block { background: #333; }
+.puzzle-cell.selected { background: #cfe2ff; }
+.puzzle-cell.found { background: #d1e7dd; }
+.puzzle-cell.hint { background: #fff3cd; }
+.puzzle-cell .num { position: absolute; top: 0; left: 2px; font-size: 0.6rem; color: #555; }
+.puzzle-cell { position: relative; }
+.sudoku .puzzle-cell.box-right { border-right: 2px solid #333; }
+.sudoku .puzzle-cell.box-bottom { border-bottom: 2px solid #333; }
+.wordsearch .puzzle-cell { cursor: pointer; }

@@ -1,0 +1,12 @@
+@* SHARED error page (404, 403, 400 ...). Filled by PageExceptionFilter or HomeController. *@
+@model ErrorViewModel
+@{ ViewData["Title"] = "Error"; }
+<div class="container py-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="display-6">@Model.Status</h1>
+            <p class="lead">@Model.Message</p>
+            <a class="btn btn-primary" href="/dashboard">Back to dashboard</a>
+        </div>
+    </div>
+</div>
