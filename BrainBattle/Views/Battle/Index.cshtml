@@ -1,0 +1,89 @@
+@* VIEW (F1 Abrar): start a casual quiz battle and share its link with friends. *@
+@model BattleIndexViewModel
+@{ ViewData["Title"] = "Quiz Battle"; }
+<div class="container py-4" style="max-width: 720px">
+    <h2 class="mb-1">Real-Time Quiz Battle</h2>
+    <p class="text-muted">Play live against 1–3 friends. Faster correct answers earn more points.</p>
+
+    @if (Model.CurrentMatchId != null)
+    {
+        <div class="alert alert-warning d-flex justify-content-between align-items-center">
+            <span>You are already in a battle.</span>
+            <a class="btn btn-sm btn-warning" href="/battle/@Model.CurrentMatchId">Rejoin</a>
+        </div>
+    }
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">New casual battle</h5>
+            <form id="create-battle">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="categoryId">Category</label>
+                        <select class="form-select" id="categoryId">
+                            <option value="">Mixed (all categories)</option>
+                            @foreach (var c in Model.Categories)
+                            {
+                                <option value="@c.Id">@c.Icon @c.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="difficulty">Difficulty</label>
+                        <select class="form-select" id="difficulty">
+                            <option value="">Any</option>
+                            @foreach (var d in Quiz.Difficulties)
+                            {
+                                <option value="@d">@d</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="questionCount">Questions</label>
+                        <input class="form-control" type="number" id="questionCount" min="3" max="20" value="10" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="questionTime">Seconds per question</label>
+                        <input class="form-control" type="number" id="questionTime" min="5" max="60" value="15" />
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3" type="submit">Create battle</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">How it works</h5>
+            <ol class="mb-0">
+                <li>Create a battle and copy the link on the next page.</li>
+                <li>Send it to up to 3 friends. They open it while logged in.</li>
+                <li>When everybody is in, press <strong>Start</strong>.</li>
+                <li>Correct answer = 100 points + up to 100 bonus for speed.</li>
+            </ol>
+            <p class="small text-muted mt-2 mb-0">Looking for an opponent of your level? Try <a href="/ranked">Ranked</a>.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('create-battle').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const button = e.target.querySelector('button');
+            button.disabled = true;
+            try {
+                const { matchId } = await BB.api('POST', '/api/battles', {
+                    categoryId: document.getElementById('categoryId').value || null,
+                    difficulty: document.getElementById('difficulty').value || null,
+                    questionCount: Number(document.getElementById('questionCount').value),
+                    questionTime: Number(document.getElementById('questionTime').value),
+                });
+                location.href = `/battle/${matchId}`;
+            } catch (err) {
+                BB.toast(err.message, { type: 'danger' });
+                button.disabled = false;
+            }
+        });
+    </script>
+}
